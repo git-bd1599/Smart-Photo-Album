@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style type="text/css">
+
+.header {
+  padding: 40px;
+  text-align: center;
+  background: #f9f7f7;
+  margin:30px;
+  font-size:20px;
+}
+
+#search{
+    width: 80%;
+    margin: auto;
+    display: block; 
+    text-align: center;
+    margin-top: 50px;
+}
+
+#searchin{
+    float: left;
+    width: 90%;
+    height: 30px;
+}
+
+#btngo{
+    float: left;
+    width: 10%;
+    height: 30px;
+    background-color: #333;
+    color: white;
+    border: none;
+    font-weight: bold;
+}
+
+#list{
+     padding: 0;
+     list-style-type: none;
+     display: none;
+     position: absolute;
+     z-index: 9999;
+     width: 80%;
+     margin-top: 30px;
+     max-height: 120px;
+     overflow: hidden;
+     overflow-y: scroll;
+}
+
+#list > li{
+     text-align: left;
+     padding: 5px;
+     display: none;
+}
+
+#list > li:hover{
+      background-color: #eee;
+}
+</style>
+
+<head>
+    <title>Photo Album</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!------ Include the above in your HEAD tag ---------->
+    <style type="text/css">
+        /* Container */
+        .container{
+        margin: 0 auto;
+        border: 0px solid black;
+        width: 50%;
+        height: 250px;
+        border-radius: 3px;
+        background-color: #f9f7f7;
+        text-align: center;
+        }
+        /* Preview */
+        .preview{
+        width: 100px;
+        height: 100px;
+        border: 1px solid black;
+        margin: 0 auto;
+        background: white;
+        }
+
+        .preview img{
+        display: none;
+        }
+        /* Button */
+        .button{
+        border: 0px;
+        background-color: black;
+        color: white;
+        padding: 5px 15px;
+        margin-left: 10px;
+        }
+        #record {
+             background-color: #4CAF50; /* Green */
+             border: none;
+             color: white;
+             padding: 15px 32px;
+             text-align: center;
+             text-decoration: none;
+             display: inline-block;
+             font-size: 16px;
+             position: relative;
+        }
+        #stopRecord {
+            background-color: #ff9999; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            position: relative;
+        }
+        #recordedAudio {
+            left: 100px;
+            right: 100px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+   <div class="header">
+       <!--Header content-->
+       <h1>TALK 2 ALBUM</h1>
+       <h5>A VOICE ENABLED PHOTO ALBUM</h5>
+   </div>
+
+    <div class="container">
+        <form method="post" action="" enctype="multipart/form-data" id="myform">
+            <div> UPLOAD PICTURES HERE </div>
+            <div >
+                <input type="file" id="file" name="file"/>
+                <input type="button" class="button" value="Upload" id="but_upload"><br><br>
+                <label for="customLabels">Keywords:(csv format) </label>
+                <input type="text" id="labels" name="customLabels" /> <br />
+            </div>
+        </form>
+    </div>
+
+    <div id="search">
+        <div id="container1">
+            <input type="text" id="searchin" placeholder="Search..."/>
+            <button id="btngo" class="btn btn-primary" type="button">Search</button>
+        </div>
+        <div>
+            <p>
+                <button id=record>Voice Search</button>
+                <button id=stopRecord disabled>Stop</button>
+            </p>
+            <p>
+                <audio id=recordedAudio></audio>
+
+            </p>
+        </div>
+        <div id="albumcontainer"></div>
+    </div>
+
+</body>
+<?php header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Credentials: true ");
+header("Access-Control-Allow-Methods: OPTIONS, GET, POST, PUT");
+header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control"); ?>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="recorder.mp3.min.js"></script>
+<script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+<script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+<script type="text/javascript" src="lib/url-template/url-template.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+<script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+<script type="text/javascript" src="apigClient.js"></script>
+
+<script type="text/javascript">
+    /*** Connect with API Gateway ***/
+    var apigClient = apigClientFactory.newClient({accessKey: '',
+            secretKey: ''});
+
+    function showImage(src, width, height, alt) {
+        var img = document.createElement("img");
+        img.src = src;
+        img.width = width;
+        img.height = height;
+        img.alt = alt;
+    };
+
+    // upload photos
+    $(document).ready(function(){
+
+        $("#but_upload").click(function(){
+
+            // var fd = new FormData();
+            var files = $('#file')[0].files[0];
+            //var files = document.getElementByID("file").value;
+            var metadata_Labels = document.getElementById("labels").value;
+            // fd.append('file',files);
+            // console.log("Uncomment to upload!!")
+            // console.log(fd)
+            console.log(files)
+            console.log(files.type)
+            console.log(files.name)
+            console.log(labels)
+
+            let config = {
+                headers:{'Content-Type': files.type , "X-Api-Key":"p2yEiVZOiW5XoAIkOPr5A2GNSDByeUUp1RVX1cNh", "x-amz-meta-customlabels":metadata_Labels}
+            };
+
+            url = 'https://58adymy2qe.execute-api.us-west-2.amazonaws.com/dev/upload/photoalbum.hw2/' + files.name
+            axios.put(url,files,config).then(response=>{
+                // console.log(response.data)
+                alert("Upload successful!!");
+            })
+        });
+    });
+
+    // after click the search button, show the search result
+    $('#btngo').click(function(){
+        console.log('Search clicked!');
+        query = $('#searchin').val();
+		console.log(query);
+        //params = {q: query};
+        var params = {
+            q: query
+        };
+        var body = {};
+        var additionalParams = {
+                headers: {
+                },
+                queryParams: {
+                     q: query
+                }
+        };
+		console.log(additionalParams);
+        apigClient.searchGet(params, body, additionalParams)
+            .then(function(result){
+            //This is where you would put a success callback
+            console.log(result);
+
+            //clear document from previous results
+            document.getElementById("albumcontainer").innerHTML = "";
+
+			let img_list = result.data
+			if(img_list === "No such photos.") {
+                    alert("No such photos!!")
+                    return
+                }
+
+
+            for (var i = 0; i < img_list.length; i++) {
+                img_url = img_list[i];
+                new_img = document.createElement('img');
+                new_img.src = img_url;
+                //document.body.appendChild(new_img);
+                document.getElementById("albumcontainer").appendChild(new_img);
+            }
+
+            }).catch(function(result){
+            //This is where you would put an error callback
+            console.log(result);
+            });
+
+    });
+
+    var rec=Recorder({
+        bitRate:32,
+        sampleRate:24000
+        });
+
+    function sendData(data) {
+        let config = {
+                headers:{'Content-Type': data.type,"X-Api-Key":"p2yEiVZOiW5XoAIkOPr5A2GNSDByeUUp1RVX1cNh"}
+            };
+		console.log(data.type);
+		console.log("-----------------");
+        url = 'https://58adymy2qe.execute-api.us-west-2.amazonaws.com/dev/upload/mp3search/test.mp3'
+        axios.put(url,data,config).then(response=>{
+            console.log(response.data)
+            alert("Upload successful!!");
+            query = "voiceSearch";
+            params = {q: query};
+            apigClient.searchGet(params, {}, {})
+                .then(function(result){
+                    //This is where you would put a success callback
+                    console.log(result);
+                }).catch(function(result){
+                    //This is where you would put an error callback
+                    console.log(result);
+                });
+            setTimeout(function(){
+                params = {q: "voiceResult"};
+                apigClient.searchGet(params, {}, {})
+                .then(function(result){
+                //This is where you would put a success callback
+                console.log(result);
+
+                let img_list = result.data
+                if(img_list === "No such photos.") {
+                    alert("No such photos!!")
+                    return
+                }
+                for (var i = 0; i < img_list.length; i++) {
+                    img_url = img_list[i];
+                    new_img = document.createElement('img');
+                    new_img.src = img_url;
+                    document.body.appendChild(new_img);
+                }
+
+                }).catch(function(result){
+                //This is where you would put an error callback
+                    console.log(result);
+                    alert("No such photos!!");
+                });
+            }, 70000);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
+    record.onclick = e => {
+        console.log('I was clicked')
+        record.disabled = true;
+        record.style.backgroundColor = "green"
+        stopRecord.disabled=false;
+
+        rec.open(function(){
+            rec.start();
+        },function(msg,isUserNotAllow){
+            console.log((isUserNotAllow?"UserNotAllow，":"")+"can't record:"+msg);
+        });
+    }
+    stopRecord.onclick = e => {
+        console.log("I was clicked")
+        record.disabled = false;
+        stop.disabled=true;
+        record.style.backgroundColor = "blue"
+        rec.stop(function(blob,duration){
+            console.log(URL.createObjectURL(blob),"Duration:"+duration+"ms");
+            console.log(blob);
+            rec.close();
+            var audio=document.createElement("audio");
+            audio.controls=true;
+            document.body.appendChild(audio);
+            audio.src=URL.createObjectURL(blob);
+            // audio.play();
+            sendData(blob);
+        });
+    }
+
+
+<!--    // after click the search button, show the search result-->
+<!--    $('#btngo').click(function(){-->
+<!--        console.log('Search clicked!');-->
+<!--        console.log("Uncomment to upload!!");-->
+<!--        query = $('#searchin').val();-->
+<!--		console.log(query);-->
+<!--        params = {q: query};-->
+<!--		console.log(params);-->
+<!--        apigClient.searchGet(params, {}, {})-->
+<!--            .then(function(result){-->
+<!--            //This is where you would put a success callback-->
+<!--            console.log(result);-->
+
+<!--            //clear document from previous results-->
+<!--            document.getElementById("albumcontainer").innerHTML = "";-->
+
+<!--			let img_list = result.data-->
+<!--			if(img_list === "No such photos.") {-->
+<!--                    alert("No such photos!!")-->
+<!--                    return-->
+<!--                }-->
+
+
+<!--            for (var i = 0; i < img_list.length; i++) {-->
+<!--                img_url = img_list[i];-->
+<!--                new_img = document.createElement('img');-->
+<!--                new_img.src = img_url;-->
+<!--                //document.body.appendChild(new_img);-->
+<!--                document.getElementById("albumcontainer").appendChild(new_img);-->
+<!--            }-->
+
+<!--            }).catch(function(result){-->
+<!--            //This is where you would put an error callback-->
+<!--            console.log(result);-->
+<!--            });-->
+
+<!--    });-->
+
+
+
+
+</script>
+
+</html>
+
