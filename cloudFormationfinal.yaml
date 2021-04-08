@@ -1,0 +1,104 @@
+Description: Create Cloud Formation Stack
+Parameters:
+  AvailabilityZoneA:
+    Type: String
+    Description: First AvailabilityZone
+    Default: us-east-1
+Resources:
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: PublicRead
+      BucketName: s3website12
+      MetricsConfigurations:
+        - Id: EntireBucket
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+  AGRA3ZWAY:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: API Search Photos
+    DeletionPolicy: Retain
+  GETMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      RestApiId: !Ref AGRA3ZWAY
+      ResourceId: !GetAtt 
+        - AGRA3ZWAY
+        - RootResourceId
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+  AGS2KL3Z:
+    Type: 'AWS::ApiGateway::Stage'
+    Properties:
+      RestApiId: !Ref AGRA3ZWAY
+      DeploymentId: !Ref Deployment
+  Deployment:
+    DependsOn: GETMethod
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId: !Ref AGRA3ZWAY
+      Description: My deployment
+      StageName: AGS2KL3Z
+  ED1HS3Z:
+    Type: 'AWS::Elasticsearch::Domain'
+    Properties:
+      DomainName: photosalbum201
+      ElasticsearchClusterConfig:
+        InstanceType: t2.small.elasticsearch
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+        VolumeType: gp2
+  lfindexphotosRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+    DeletionPolicy: Retain
+  lfindexphotos:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+          import json
+          def handler(event, context):
+              print("Event: %s" % json.dumps(event))
+      FunctionName: lfindexphotos
+      Handler: lf1.lambda_handler
+      Role: !GetAtt 
+        - lfindexphotosRole
+        - Arn
+      Runtime: python3.8
+    DeletionPolicy: Retain
+  S3B4G7GY:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: cc3voices1
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt 
+      - S3Bucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - S3Bucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content
