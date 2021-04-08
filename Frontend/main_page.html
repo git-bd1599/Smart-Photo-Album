@@ -123,6 +123,12 @@
             position: relative;
         }
     </style>
+
+    <!-- //AWS Transcribe WEBSOCKET IMPLEMENTATION//-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="https://cdn.shoelace.style/1.0.0-beta24/shoelace.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -150,16 +156,109 @@
             <input type="text" id="searchin" placeholder="Search..."/>
             <button id="btngo" class="btn btn-primary" type="button">Search</button>
         </div>
-        <div>
-            <p>
-                <button id=record>Voice Search</button>
-                <button id=stopRecord disabled>Stop</button>
-            </p>
-            <p>
-                <audio id=recordedAudio></audio>
 
-            </p>
+<!-- //AWS Transcribe WEBSOCKET IMPLEMENTATION//-->
+        <div id="error" class="isa_error"></div>
+
+        <textarea id="transcript" placeholder="Press Start and speak into your mic" rows="5"
+                  readonly="readonly"></textarea>
+        <div class="row">
+            <div class="col">
+                <button id="start-button" class="button-xl" title="Start Transcription">
+                    <i class="fa fa-microphone"></i> Start
+                </button>
+                <button id="stop-button" class="button-xl" title="Stop Transcription" disabled="true"><i
+                        class="fa fa-stop-circle"></i> Stop
+                </button>
+                <button id="reset-button" class="button-xl button-secondary" title="Clear Transcript">
+                    Clear Transcript
+                </button>
+                <button id ='search-voice-button' class="button-xl button-secondary" title="Voice Search" type="button">
+                    Voice-Enabled Search
+                </button>
+            </div>
+<!--            <div class="col">-->
+<!--                <a class="float-right" href="https://aws.amazon.com/free/" aria-label="Amazon Web Services">-->
+<!--                    <img id="logo" src="AWS_logo_RGB.png" alt="AWS Logo" />-->
+<!--                </a>-->
+<!--            </div>-->
         </div>
+        <div class="row">
+            <div class="col">
+                <label>Access ID:</label>
+                <input type="password" id="access_id" placeholder="ACCESS ID" value="AKIARW332D32CJCM5OEU" disabled="disabled" />
+                <br />
+                <label>Secret Key:</label>
+                <input type="password" id="secret_key" placeholder="SECRET KEY" value="Pca3RowIg7iNDsVSD1hdMKmNi/wqwaW+Ma7fCcdT"
+                       disabled="disabled" />
+<!--                <label>Session Token (if using MFA):</label>-->
+<!--                <input type="password" id="session_token" placeholder="SESSION TOKEN" value="" />-->
+            </div>
+            <div class="col">
+                <label>Language: </label>
+                <select id="language" disabled="disabled">
+                    <optgroup label="English">
+                        <option value="en-US">US English (en-US)</option>
+<!--                        <option value="en-AU">Australian English (en-AU)</option>-->
+<!--                        <option value="en-GB">British English (en-GB)</option>-->
+                    </optgroup>
+<!--                    <optgroup label="French">-->
+<!--                        <option value="fr-CA">Canadian French (fr-CA)</option>-->
+<!--                        <option value="fr-FR">French (fr-FR)</option>-->
+<!--                    </optgroup>-->
+<!--                    <optgroup label="Spanish">-->
+<!--                        <option value="es-US">US Spanish (es-US)</option>-->
+<!--                    </optgroup>-->
+                </select>
+                <br />
+                <label>Region:</label>
+                <select id="region" disabled="disabled">
+<!--                    <option value="us-east-1">US East (N. Virginia)</option>-->
+<!--                    <option value="us-east-2">US East (Ohio)</option>-->
+                    <option value="us-west-2">US West (Oregon)</option>
+<!--                    <option value="ap-southeast-2">Asia Pacific (Sydney)</option>-->
+<!--                    <option value="ca-central-1">Canada (Central)</option>-->
+<!--                    <option value="eu-west-1">EU (Ireland)</option>-->
+                </select>
+            </div>
+        </div>
+
+<!--        <div class="row">-->
+<!--            <div class="col">-->
+<!--                <button id="start-button" class="button-xl" title="Start Transcription">-->
+<!--                    <i class="fa fa-microphone"></i> Start-->
+<!--                </button>-->
+<!--                <button id="stop-button" class="button-xl" title="Stop Transcription" disabled="true"><i-->
+<!--                        class="fa fa-stop-circle"></i> Stop-->
+<!--                </button>-->
+<!--                <button id="reset-button" class="button-xl button-secondary" title="Clear Transcript">-->
+<!--                    Clear Transcript-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div class="col">-->
+<!--                <a class="float-right" href="https://aws.amazon.com/free/" aria-label="Amazon Web Services">-->
+<!--                    <img id="logo" src="AWS_logo_RGB.png" alt="AWS Logo" />-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <a href="https://github.com/aws-samples/amazon-transcribe-websocket-static" aria-label="View source on GitHub">-->
+<!--        <svg id="github" width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">-->
+<!--            <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>-->
+<!--            <path-->
+<!--                d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"-->
+<!--                fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>-->
+<!--            <path-->
+<!--                d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"-->
+<!--                fill="currentColor" class="octo-body"></path>-->
+<!--        </svg>-->
+<!--        </a>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="dist/main.js"></script>
+        <!-- //AWS Transcribe WEBSOCKET IMPLEMENTATION//-->
+
+    </div>
         <div id="albumcontainer"></div>
     </div>
 
@@ -225,6 +324,7 @@ header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Si
             };
 
             url = 'https://58adymy2qe.execute-api.us-west-2.amazonaws.com/dev/upload/photoalbum.hw2/' + files.name
+            //url = 'https://58adymy2qe.execute-api.us-west-2.amazonaws.com/dev/upload/photoalbum.hw2/testimg.jpg'
             axios.put(url,files,config).then(response=>{
                 // console.log(response.data)
                 alert("Upload successful!!");
@@ -236,6 +336,53 @@ header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Si
     $('#btngo').click(function(){
         console.log('Search clicked!');
         query = $('#searchin').val();
+		console.log(query);
+        //params = {q: query};
+        var params = {
+            q: query
+        };
+        var body = {};
+        var additionalParams = {
+                headers: {
+                },
+                queryParams: {
+                     q: query
+                }
+        };
+		console.log(additionalParams);
+        apigClient.searchGet(params, body, additionalParams)
+            .then(function(result){
+            //This is where you would put a success callback
+            console.log(result);
+
+            //clear document from previous results
+            document.getElementById("albumcontainer").innerHTML = "";
+
+			let img_list = result.data
+			if(img_list === "No such photos.") {
+                    alert("No such photos!!")
+                    return
+                }
+
+            for (var i = 0; i < img_list.length; i++) {
+                img_url = img_list[i];
+                new_img = document.createElement('img');
+                new_img.src = img_url;
+                //document.body.appendChild(new_img);
+                document.getElementById("albumcontainer").appendChild(new_img);
+            }
+
+            }).catch(function(result){
+            //This is where you would put an error callback
+            console.log(result);
+            });
+
+    });
+
+    // after transcribe click the search button, show the search result
+    $('#search-voice-button').click(function(){
+        console.log('Transcribe Search clicked!');
+        query = $('#transcript').val();
 		console.log(query);
         //params = {q: query};
         var params = {
@@ -279,133 +426,6 @@ header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Si
             });
 
     });
-
-    var rec=Recorder({
-        bitRate:32,
-        sampleRate:24000
-        });
-
-    function sendData(data) {
-        let config = {
-                headers:{'Content-Type': data.type,"X-Api-Key":"p2yEiVZOiW5XoAIkOPr5A2GNSDByeUUp1RVX1cNh"}
-            };
-		console.log(data.type);
-		console.log("-----------------");
-        url = 'https://58adymy2qe.execute-api.us-west-2.amazonaws.com/dev/upload/mp3search/test.mp3'
-        axios.put(url,data,config).then(response=>{
-            console.log(response.data)
-            alert("Upload successful!!");
-            query = "voiceSearch";
-            params = {q: query};
-            apigClient.searchGet(params, {}, {})
-                .then(function(result){
-                    //This is where you would put a success callback
-                    console.log(result);
-                }).catch(function(result){
-                    //This is where you would put an error callback
-                    console.log(result);
-                });
-            setTimeout(function(){
-                params = {q: "voiceResult"};
-                apigClient.searchGet(params, {}, {})
-                .then(function(result){
-                //This is where you would put a success callback
-                console.log(result);
-
-                let img_list = result.data
-                if(img_list === "No such photos.") {
-                    alert("No such photos!!")
-                    return
-                }
-                for (var i = 0; i < img_list.length; i++) {
-                    img_url = img_list[i];
-                    new_img = document.createElement('img');
-                    new_img.src = img_url;
-                    document.body.appendChild(new_img);
-                }
-
-                }).catch(function(result){
-                //This is where you would put an error callback
-                    console.log(result);
-                    alert("No such photos!!");
-                });
-            }, 70000);
-        }).catch(err => {
-            console.log(err);
-        })
-    }
-
-    record.onclick = e => {
-        console.log('I was clicked')
-        record.disabled = true;
-        record.style.backgroundColor = "green"
-        stopRecord.disabled=false;
-
-        rec.open(function(){
-            rec.start();
-        },function(msg,isUserNotAllow){
-            console.log((isUserNotAllow?"UserNotAllow，":"")+"can't record:"+msg);
-        });
-    }
-    stopRecord.onclick = e => {
-        console.log("I was clicked")
-        record.disabled = false;
-        stop.disabled=true;
-        record.style.backgroundColor = "blue"
-        rec.stop(function(blob,duration){
-            console.log(URL.createObjectURL(blob),"Duration:"+duration+"ms");
-            console.log(blob);
-            rec.close();
-            var audio=document.createElement("audio");
-            audio.controls=true;
-            document.body.appendChild(audio);
-            audio.src=URL.createObjectURL(blob);
-            // audio.play();
-            sendData(blob);
-        });
-    }
-
-
-<!--    // after click the search button, show the search result-->
-<!--    $('#btngo').click(function(){-->
-<!--        console.log('Search clicked!');-->
-<!--        console.log("Uncomment to upload!!");-->
-<!--        query = $('#searchin').val();-->
-<!--		console.log(query);-->
-<!--        params = {q: query};-->
-<!--		console.log(params);-->
-<!--        apigClient.searchGet(params, {}, {})-->
-<!--            .then(function(result){-->
-<!--            //This is where you would put a success callback-->
-<!--            console.log(result);-->
-
-<!--            //clear document from previous results-->
-<!--            document.getElementById("albumcontainer").innerHTML = "";-->
-
-<!--			let img_list = result.data-->
-<!--			if(img_list === "No such photos.") {-->
-<!--                    alert("No such photos!!")-->
-<!--                    return-->
-<!--                }-->
-
-
-<!--            for (var i = 0; i < img_list.length; i++) {-->
-<!--                img_url = img_list[i];-->
-<!--                new_img = document.createElement('img');-->
-<!--                new_img.src = img_url;-->
-<!--                //document.body.appendChild(new_img);-->
-<!--                document.getElementById("albumcontainer").appendChild(new_img);-->
-<!--            }-->
-
-<!--            }).catch(function(result){-->
-<!--            //This is where you would put an error callback-->
-<!--            console.log(result);-->
-<!--            });-->
-
-<!--    });-->
-
-
-
 
 </script>
 
