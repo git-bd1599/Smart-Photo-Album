@@ -40,6 +40,50 @@ Implemented a photo album web application, that can be searched using natural la
     - PUT /photos
 
       Set up the method as an Amazon S3 Proxy . This allows API Gateway to forward your PUT request directly to S3.
+      - Use a custom **x-amz-meta-customLabels** HTTP header to include any custom labels the user specifies at upload time.
+    - GET /search?q={query text}
+      
+      Connect this method to the search Lambda function (LF2)
+    - Setup an API key for your two API methods
+    - Deploy the API.
+    - Generate a SDK for the API (SDK1).
+5. Frontend
+  - Built a simple frontend application that allows users to:
+    - Make search requests to the GET /search endpoint
+    - Display the results (photos) resulting from the query
+    - Upload new photos using the PUT /photos
+      - In the upload form, allow the user to specify one or more custom labels, that will be appended to the list of labels detected automatically by Rekognition. These custom         labels should be converted to a comma-separated list and uploaded as part of the S3 object’s metadata using a **x-amz-meta-customLabels** metadata HTTP header.
+      
+        For instance, if you specify two custom labels at upload time, "Sam" and "Sally", the metadata HTTP header should look like: *x-amz-meta-customLabels: Sam, Sally*
+    - Create a S3 bucket for your frontend (B1)
+    - Set up the bucket for static website hosting
+    - Upload the frontend files to the bucket (B2).
+    - Integrate the API Gateway-generated SDK (SDK1) into the frontend, to connect your API.
+6. Implement Voice accessibility in the frontend
+  - Give the frontend user the choice to use voice rather than text to perform the search.
+  - Use Amazon Transcribe on the frontend to transcribe speech to text (STT) in real time , then use the transcribed text to perform the search, using the same API like in the       previous steps.
+7. Deployed the code using AWS CodePipeline
+  - Define a pipeline (P1) in AWS CodePipeline that builds and deploys the code for/to all your Lambda functions
+  - Define a pipeline (P2) in AWS CodePipeline that builds and deploys your frontend code to its corresponding S3 bucket
+8. Create a AWS CloudFormation template for the stack
+  - Create a CloudFormation template (T1) to represent all the infrastructure resources (ex. Lambdas, ElasticSearch, API Gateway, CodePipeline, etc.) and permissions (IAM           policies, roles, etc.).
+
+At this point you should be able to:
+  - Visit your photo album application using the S3 hosted URL.
+  - Search photos using natural language via voice and text.
+  - See relevant results (ex. If you searched for a cat, you should be able to see
+    photos with cats in them) based on what you searched.
+  - Upload new photos (with or without custom labels) and see them appear in the
+    search results.
+    
+ 
+ ![Architecture](https://user-images.githubusercontent.com/61260957/120049287-1c662300-bfdf-11eb-9ff5-595dc21772f1.PNG)
+
+    
+
+
+
+
       
 
 
