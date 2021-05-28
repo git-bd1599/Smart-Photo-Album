@@ -14,15 +14,36 @@ Implemented a photo album web application, that can be searched using natural la
     - Store a JSON object in an ElasticSearch index (“photos”) that references the S3 object from the PUT event (E1) and append string labels to the labels array (A1), one for           each label detected by Rekognition.
         ```
        {
-          “objectKey”: “my-photo.jpg”,
-          “bucket”: “my-photo-bucket”,
-          “createdTimestamp”: “2018-11-05T12:40:02”,
-          “labels”: [
-              “person”,
-              “dog”,
-              “ball”,
-              “park”
+          "objectKey": "my-photo.jpg",
+          "bucket": "my-photo-bucket",
+          "createdTimestamp": "2018-11-05T12:40:02",
+          "labels": [
+              "person",
+              "dog",
+              "ball",
+              "park"
             ]
         }
         ```
+3. Search
+  - Created a Lambda function (LF2) called “search-photos”.
+  - Created an Amazon Lex bot to handle search queries.
+    - Created one intent named “SearchIntent”.
+    - Added training utterances to the intent, such that the bot can pick up both keyword searches (“trees”, “birds”), as well as sentence searches (“show me trees”, “show me         photos with trees and birds in them”).
+  - Implemented the Search Lambda function (LF2):
+    - Given a search query “q”, disambiguate the query using the Amazon Lex bot.
+    - If the Lex disambiguation request yields any keywords (K1, …, Kn), search the “photos” ElasticSearch index for results, and return them accordingly (as per the API spec).
+    - Otherwise, return an empty array of results (as per the API spec).
+4. Built the API layer
+  - Built an API using API Gateway.
+  - The API has two methods:
+    - PUT /photos
+
+      Set up the method as an Amazon S3 Proxy . This allows API Gateway to forward your PUT request directly to S3.
+      
+
+
+
+      
+
 
