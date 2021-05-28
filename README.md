@@ -12,7 +12,7 @@ Implemented a photo album web application, that can be searched using natural la
     - Given a S3 PUT event (E1) detect labels in the image, using Rekognition (“detectLabels” method).
     - Use the S3 SDK’s headObject method to retrieve the S3 metadata created at the object’s upload time. Retrieve the x-amz-meta-customLabels metadata field, if applicable, and         create a JSON array (A1) with the labels.
     - Store a JSON object in an ElasticSearch index (“photos”) that references the S3 object from the PUT event (E1) and append string labels to the labels array (A1), one for           each label detected by Rekognition.
-        '''{
+        ```{
           “objectKey”: “my-photo.jpg”,
           “bucket”: “my-photo-bucket”,
           “createdTimestamp”: “2018-11-05T12:40:02”,
@@ -22,5 +22,5 @@ Implemented a photo album web application, that can be searched using natural la
               “ball”,
               “park”
             ]
-        }'''
+        }```
 
