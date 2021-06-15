@@ -1,0 +1,9 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket lambdadeploycicdbucket --output-template-file indexphotos.yaml
+artifacts:
+  files:
+    - indexphotos.yaml
+
